@@ -48,6 +48,7 @@ init({[Table, Delay, Test], _}) ->
 handle_event(sigterm, {Table, Delay, Test} = State) ->
     io:format("~n~n***K8STrafficDrain: SIGTERM received. Draining and then stopping in ~p ms~n", [Delay]),
     ets:insert(Table, {draining, true}),
+    gproc:send({p, l, important_signals}, sigterm_received),
     case Test of
         Pid when is_pid(Pid) ->
             erlang:send(Pid, draining);
